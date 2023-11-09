@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="ca">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Client Web API</title>
+    <script>
+        function ferPeticioAPI() {
+            var xhr = new XMLHttpRequest();
+            var url = "https://services1.arcgis.com/nCKYwcSONQTkPA4K/arcgis/rest/services/Playas_2015/FeatureServer/0/query?where=Provincia%20%3D%20'ILLES%20BALEARS'&outFields=*&outSR=4326&f=json";
+
+            xhr.open('GET', url, true);
+            xhr.onload = function () {
+                if (xhr.status === 200) {
+                    console.log("hola")
+                    var data = JSON.parse(xhr.responseText);
+                    var resultatsDiv = document.getElementById('resultats');
+                    resultatsDiv.innerHTML = '<h2>Dades rebudes de l\'API:</h2>';
+
+                } else {
+                    var resultatsDiv = document.getElementById('resultats');
+                    resultatsDiv.innerHTML = '<h2>Error en la sol·licitud a l\'API. Codi d\'estat: ' + xhr.status + '</h2>';
+                }
+            };
+            xhr.send();
+        }
+    </script>
+</head>
+
+<body>
+    <h1>Playas de las Islas Baleares</h1>
+    <form id="api-form">
+        <input type="text" id="api-endpoint" placeholder="Playa">
+        <button type="button" onclick="ferPeticioAPI()">Enviar solicitud</button>
+    </form>
+    <div id="resultats"></div>
+</body>
+
+</html>
