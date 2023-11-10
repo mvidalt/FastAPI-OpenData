@@ -13,31 +13,6 @@ import requests
 import json
 import typing
 
-
-
-""" async def get_all_playas():
-    url = "https://services1.arcgis.com/nCKYwcSONQTkPA4K/arcgis/rest/services/Playas_2015/FeatureServer/0/query?where=Provincia%20%3D%20'ILLES%20BALEARS'&outFields=*&outSR=4326&f=json"
-    response = requests.get(url)
-    
-    if response.status_code == 200:
-        playas_data = response.json()
-        
-        # Obtener los atributos de las playas
-        playas_attributes = [playa["attributes"] for playa in playas_data["features"]]
-        
-        # Construir la tabla HTML
-        table_html = "<table border='1'><tr>"
-        headers = playas_attributes[0].keys()
-        table_html += "".join(f"<th>{header}</th>" for header in headers) + "</tr>"
-        for playa in playas_attributes:
-            table_html += "<tr>" + "".join(f"<td>{value}</td>" for value in playa.values()) + "</tr>"
-        table_html += "</table>"
-        
-        # Devolver la tabla HTML como respuesta
-        return Response(content=table_html, media_type="text/html")
-    else:
-        raise HTTPException(status_code=response.status_code, detail="Error en obtener los datos de la API")"""
-
 app = FastAPI()
 
 class PrettyJSONResponse(Response):
@@ -51,7 +26,10 @@ class PrettyJSONResponse(Response):
             indent=4,
             separators=(", ", ": "),
         ).encode("utf-8")
-    
+
+
+app = FastAPI()
+
 def get_all_playas_data():
     url = "https://services1.arcgis.com/nCKYwcSONQTkPA4K/arcgis/rest/services/Playas_2015/FeatureServer/0/query?where=Provincia%20%3D%20'ILLES%20BALEARS'&outFields=*&outSR=4326&f=json"
     response = requests.get(url)
@@ -62,13 +40,24 @@ def get_all_playas_data():
     else:
         raise HTTPException(status_code=response.status_code, detail="Error en obtener los datos de la API")
 
+def generate_html_table(playas_data):
+    table_html = "<table border='1'><tr>"
+    headers = playas_data[0].keys()
+    table_html += "".join(f"<th>{header}</th>" for header in headers) + "</tr>"
+    for playa in playas_data:
+        table_html += "<tr>" + "".join(f"<td>{value}</td>" for value in playa.values()) + "</tr>"
+    table_html += "</table>"
+    return table_html
 
-app = FastAPI()
 
-@app.get("/", response_class=PrettyJSONResponse)
+@app.get("/")
 async def get_all_playas():
     playas_data = get_all_playas_data()
-    return playas_data
+    
+    playas_attributes = [playa["attributes"] for playa in playas_data]
+    table_html = generate_html_table(playas_attributes)
+    return Response(content=table_html, media_type="text/html")
+
 
 @app.get("/isla/{isla}", response_class=PrettyJSONResponse)
 async def get_playas_by_isla(isla: str = Path(..., title="Nombre de la isla")):
@@ -77,7 +66,8 @@ async def get_playas_by_isla(isla: str = Path(..., title="Nombre de la isla")):
     for playa in playas_data:
         if playa["attributes"]["Isla"] == isla:
             filtered_playas.append(playa["attributes"])
-    return filtered_playas
+    table_html = generate_html_table(filtered_playas)
+    return Response(content=table_html, media_type="text/html")
 
 @app.get("/conteo/{isla}", response_model=int)
 async def count_playas_by_isla(isla: str = Path(..., title="Nombre de la isla")):
@@ -135,7 +125,7 @@ async def estadisticas():
 
 @app.get("/index.html")
 async def index():
-    html = open("index.html", "r").read()
+    html = open("index.html", "r", encoding="utf-8").read()
     return Response(content=html, media_type="text/html")
 
 

@@ -5,35 +5,80 @@
     <meta charset="UTF-8">
     <title>Client Web API</title>
     <script>
-        function ferPeticioAPI() {
-            var xhr = new XMLHttpRequest();
-            var url = "https://services1.arcgis.com/nCKYwcSONQTkPA4K/arcgis/rest/services/Playas_2015/FeatureServer/0/query?where=Provincia%20%3D%20'ILLES%20BALEARS'&outFields=*&outSR=4326&f=json";
+        let datosVisible = false;
 
-            xhr.open('GET', url, true);
-            xhr.onload = function () {
-                if (xhr.status === 200) {
-                    console.log("hola")
-                    var data = JSON.parse(xhr.responseText);
-                    var resultatsDiv = document.getElementById('resultats');
-                    resultatsDiv.innerHTML = '<h2>Dades rebudes de l\'API:</h2>';
-
-                } else {
-                    var resultatsDiv = document.getElementById('resultats');
-                    resultatsDiv.innerHTML = '<h2>Error en la sol·licitud a l\'API. Codi d\'estat: ' + xhr.status + '</h2>';
-                }
-            };
-            xhr.send();
+        async function obtenerEstadisticas() {
+            try {
+                const response = await fetch('/estadisticas');
+                const data = await response.text();
+                document.getElementById('estadisticas').innerHTML = data;
+            } catch (error) {
+                console.error('Error al obtener estadísticas:', error);
+            }
         }
+        function obtenerPlayas() {
+            window.location.href = '/';
+        }
+
+        async function obtenerPlayasPorIsla() {
+            const isla = document.getElementById('isla').value;
+            try {
+                const response = await fetch(`/isla/${isla}`);
+                const data = await response.text();
+                if (datosVisible) {
+                    document.getElementById('playas').innerHTML = '';
+                } else {
+                    document.getElementById('playas').innerHTML = data;
+                }
+                datosVisible = !datosVisible;
+                const link = `<a href="/isla/${isla}" target="_blank">Ver en una página aparte</a>`;
+                document.getElementById('verEnPaginaAparte').innerHTML = link;
+            } catch (error) {
+                console.error('Error al obtener playas:', error);
+            }
+        }
+
+        let conteoVisible = false;
+
+        async function obtenerConteoPorIsla() {
+            const isla = document.getElementById('islacount').value;
+            try {
+                const response = await fetch(`/conteo/${isla}`);
+                const conteo = await response.json();
+                // Mostrar u ocultar el conteo en el elemento #conteo
+                if (conteoVisible) {
+                    document.getElementById('conteo').innerHTML = '';
+                } else {
+                    document.getElementById('conteo').innerHTML = `Conteo de playas en ${isla}: ${conteo}`;
+                }
+
+                document.getElementById('verConteoEnPaginaAparte').innerHTML = link;
+            } catch (error) {
+                console.error('Error al obtener conteo:', error);
+            }
+        }
+
+
     </script>
 </head>
 
 <body>
     <h1>Playas de las Islas Baleares</h1>
-    <form id="api-form">
-        <input type="text" id="api-endpoint" placeholder="Playa">
-        <button type="button" onclick="ferPeticioAPI()">Enviar solicitud</button>
-    </form>
-    <div id="resultats"></div>
+    <button onclick="obtenerEstadisticas()">Obtener Estadísticas</button>
+    <div id="estadisticas"></div>
+    <br><br>
+    <button onclick="obtenerPlayas()">Ver el listado de todas las Playas</button>
+    <label for="isla">Nombre de la isla:</label>
+    <input type="text" id="isla" name="isla">
+    <button onclick="obtenerPlayasPorIsla()">Obtener Playas por Isla</button>
+    <div id="estadisticas"></div>
+    <div id="verEnPaginaAparte"></div><br>
+    <div id="playas"></div>
+    <label for="islacount">Nombre de la isla:</label>
+    <input type="text" id="islacount" name="islacount">
+    <button onclick="obtenerConteoPorIsla()">Obtener Total de Playas segun la Isla</button>
+    <div id="conteo"></div>
+
 </body>
 
 </html>
