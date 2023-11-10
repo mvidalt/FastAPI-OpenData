@@ -1,34 +1,12 @@
 import random
 from fastapi import FastAPI, HTTPException, Response
+from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 import requests
 import uvicorn
-from pygments import highlight
-from pygments.lexers import JsonLexer
-from pygments.formatters import HtmlFormatter
-import json
-import json, typing
 from starlette.responses import Response
 from fastapi import FastAPI, HTTPException, Response, Path
 import requests
-import json
-import typing
-
-app = FastAPI()
-
-
-class PrettyJSONResponse(Response):
-    media_type = "application/json"
-
-    def render(self, content: typing.Any) -> bytes:
-        return json.dumps(
-            content,
-            ensure_ascii=False,
-            allow_nan=False,
-            indent=4,
-            separators=(", ", ": "),
-        ).encode("utf-8")
-
 
 app = FastAPI()
 
@@ -54,7 +32,7 @@ def generate_html_table(playas_data):
 
 
 
-@app.get("/")
+@app.get("/playas")
 async def get_all_playas():
     playas_data = get_all_playas_data()
     
@@ -63,12 +41,12 @@ async def get_all_playas():
     return Response(content=table_html, media_type="text/html")
 
 
-@app.get("/isla/{isla}", response_class=PrettyJSONResponse)
+@app.get("/isla/{isla}")
 async def get_playas_by_isla(isla: str = Path(..., title="Nombre de la isla")):
     playas_data = get_all_playas_data()
     filtered_playas = []
     for playa in playas_data:
-        if playa["attributes"]["Isla"] == isla:
+        if isla.lower() in playa["attributes"]["Isla"].lower():
             filtered_playas.append(playa["attributes"])
     table_html = generate_html_table(filtered_playas)
     return Response(content=table_html, media_type="text/html")
@@ -76,15 +54,15 @@ async def get_playas_by_isla(isla: str = Path(..., title="Nombre de la isla")):
 @app.get("/conteo/{isla}", response_model=int)
 async def count_playas_by_isla(isla: str = Path(..., title="Nombre de la isla")):
     playas_data = get_all_playas_data()
-    
+
     count = 0
     for playa in playas_data:
-        if playa["attributes"]["Isla"] == isla:
+        if isla.lower() in playa["attributes"]["Isla"].lower():
             count += 1
-    
+
     return count
 
-@app.get("/estadisticas",response_class=PrettyJSONResponse)
+@app.get("/estadisticas")
 async def estadisticas():
     playas_data = get_all_playas_data()
     total_playas = len(playas_data)
@@ -128,10 +106,10 @@ async def estadisticas():
 
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
-@app.get("/index.html")
+@app.get("/")
 async def index():
     html = open("index.html", "r", encoding="utf-8").read()
-    return Response(content=html, media_type="text/html")
+    return HTMLResponse(content=html)
 
 
 if __name__ == "__main__":

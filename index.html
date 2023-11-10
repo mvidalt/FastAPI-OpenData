@@ -18,27 +18,28 @@
             }
         }
         function obtenerPlayas() {
-            window.location.href = '/';
+            window.location.href = '/playas';
         }
 
         async function obtenerPlayasPorIsla() {
-    const isla = document.getElementById('isla').value;
-    try {
-        const response = await fetch(`/isla/${isla}`);
-        const data = await response.text();
-        if (datosVisible) {
-            document.getElementById('playas').innerHTML = '';
-            document.getElementById('verEnPaginaAparte').innerHTML = '';
-        } else {
-            document.getElementById('playas').innerHTML = data;
-            const link = `<a href="/isla/${isla}" target="_blank">Ver en una página aparte</a>`;
-            document.getElementById('verEnPaginaAparte').innerHTML = link;
+            cambiarTextoBoton();
+            const isla = document.getElementById('isla').value;
+            try {
+                const response = await fetch(`/isla/${isla}`);
+                const data = await response.text();
+                if (datosVisible) {
+                    document.getElementById('playas').innerHTML = '';
+                    document.getElementById('verEnPaginaAparte').innerHTML = '';
+                } else {
+                    document.getElementById('playas').innerHTML = data;
+                    const link = `<a href="/isla/${isla}" target="_blank">Ver en una página aparte</a>`;
+                    document.getElementById('verEnPaginaAparte').innerHTML = link;
+                }
+                datosVisible = !datosVisible;
+            } catch (error) {
+                console.error('Error al obtener playas:', error);
+            }
         }
-        datosVisible = !datosVisible;
-    } catch (error) {
-        console.error('Error al obtener playas:', error);
-    }
-}
 
         let conteoVisible = false;
 
@@ -47,7 +48,6 @@
             try {
                 const response = await fetch(`/conteo/${isla}`);
                 const conteo = await response.json();
-                // Mostrar u ocultar el conteo en el elemento #conteo
                 if (conteoVisible) {
                     document.getElementById('conteo').innerHTML = '';
                 } else {
@@ -59,25 +59,51 @@
                 console.error('Error al obtener conteo:', error);
             }
         }
-
+        function cambiarTextoBoton() {
+            const boton = document.getElementById('toggleButton');
+            if (datosVisible) {
+                boton.innerHTML = 'Obtener Playas por Isla';
+            } else {
+                boton.innerHTML = 'Ocultar datos';
+            }
+        }
 
     </script>
 </head>
 
 <body>
     <h1>Playas de las Islas Baleares</h1>
+    <p>Esta página web consume la API REST de playas de las Islas Baleares.</p>
+    <a href="https://opendata.esri.es/datasets/ComunidadSIG::playas-españolas/about">Pagina de donde proviene la
+        API</a><br>
+    <p>Tenemos varias maneras de filtrar los datos, primero tenemos un boton para ver todas las playas de Baleares,
+        luego tenemos otro boton
+        que muestra diferentes estadisticas de las playas, tenemos un select que nos permite filtrar las playas por isla
+        y por ultimo otro select el cual
+        podemos saber cuantas playas hay por isla</p>
+    </p>
     <button onclick="obtenerEstadisticas()">Obtener Estadísticas</button>
     <div id="estadisticas"></div>
     <br><br>
-    <button onclick="obtenerPlayas()">Ver el listado de todas las Playas</button>
+    <button onclick="obtenerPlayas()">Ver Todas las Playas</button><br><br>
     <label for="isla">Nombre de la isla:</label>
-    <input type="text" id="isla" name="isla">
-    <button onclick="obtenerPlayasPorIsla()">Obtener Playas por Isla</button>
+    <select id="isla" name="isla">
+        <option value="Mallorca">Mallorca</option>
+        <option value="Menorca">Menorca</option>
+        <option value="Ibiza">Ibiza/Eivissa</option>
+        <option value="Formentera">Formentera</option>
+    </select>
+    <button onclick="obtenerPlayasPorIsla()" id="toggleButton">Obtener Playas por Isla</button>
     <div id="estadisticas"></div>
     <div id="verEnPaginaAparte"></div><br>
     <div id="playas"></div>
     <label for="islacount">Nombre de la isla:</label>
-    <input type="text" id="islacount" name="islacount">
+    <select id="islacount" name="islacount">
+        <option value="Mallorca">Mallorca</option>
+        <option value="Menorca">Menorca</option>
+        <option value="Ibiza">Ibiza/Eivissa</option>
+        <option value="Formentera">Formentera</option>
+    </select>
     <button onclick="obtenerConteoPorIsla()">Obtener Total de Playas segun la Isla</button>
     <div id="conteo"></div>
 
