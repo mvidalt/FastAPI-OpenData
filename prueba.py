@@ -1,5 +1,6 @@
 import random
 from fastapi import FastAPI, HTTPException, Response
+from fastapi.staticfiles import StaticFiles
 import requests
 import uvicorn
 from pygments import highlight
@@ -14,6 +15,7 @@ import json
 import typing
 
 app = FastAPI()
+
 
 class PrettyJSONResponse(Response):
     media_type = "application/json"
@@ -41,13 +43,15 @@ def get_all_playas_data():
         raise HTTPException(status_code=response.status_code, detail="Error en obtener los datos de la API")
 
 def generate_html_table(playas_data):
-    table_html = "<table border='1'><tr>"
+    css_link = "<link rel='stylesheet' href='/static/styles.css'>"
+    table_html = f"{css_link}<table border='1'><tr>"
     headers = playas_data[0].keys()
     table_html += "".join(f"<th>{header}</th>" for header in headers) + "</tr>"
     for playa in playas_data:
         table_html += "<tr>" + "".join(f"<td>{value}</td>" for value in playa.values()) + "</tr>"
     table_html += "</table>"
     return table_html
+
 
 
 @app.get("/")
@@ -122,6 +126,7 @@ async def estadisticas():
 
     return Response(content=table_html, media_type="text/html")
 
+app.mount("/static", StaticFiles(directory="static"), name="static")
 
 @app.get("/index.html")
 async def index():

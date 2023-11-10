@@ -4,6 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Client Web API</title>
+    <link rel="stylesheet" href="/static/styles.css">
     <script>
         let datosVisible = false;
 
@@ -21,22 +22,23 @@
         }
 
         async function obtenerPlayasPorIsla() {
-            const isla = document.getElementById('isla').value;
-            try {
-                const response = await fetch(`/isla/${isla}`);
-                const data = await response.text();
-                if (datosVisible) {
-                    document.getElementById('playas').innerHTML = '';
-                } else {
-                    document.getElementById('playas').innerHTML = data;
-                }
-                datosVisible = !datosVisible;
-                const link = `<a href="/isla/${isla}" target="_blank">Ver en una página aparte</a>`;
-                document.getElementById('verEnPaginaAparte').innerHTML = link;
-            } catch (error) {
-                console.error('Error al obtener playas:', error);
-            }
+    const isla = document.getElementById('isla').value;
+    try {
+        const response = await fetch(`/isla/${isla}`);
+        const data = await response.text();
+        if (datosVisible) {
+            document.getElementById('playas').innerHTML = '';
+            document.getElementById('verEnPaginaAparte').innerHTML = '';
+        } else {
+            document.getElementById('playas').innerHTML = data;
+            const link = `<a href="/isla/${isla}" target="_blank">Ver en una página aparte</a>`;
+            document.getElementById('verEnPaginaAparte').innerHTML = link;
         }
+        datosVisible = !datosVisible;
+    } catch (error) {
+        console.error('Error al obtener playas:', error);
+    }
+}
 
         let conteoVisible = false;
 
