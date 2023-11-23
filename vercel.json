@@ -1,5 +1,7 @@
 {
     "rewrites": [
-        {"source": "/estadisticas", "destination": "/estadisticas"}
+		{ "src": "/", "dest": "main.py" },
+		{ "src": "/estadisticas", "dest": "main.py" },
+		{ "src": "conteo/{isla}", "dest": "main.py" }
     ]
 }
