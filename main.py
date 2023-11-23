@@ -108,10 +108,7 @@ app.mount("/static", StaticFiles(directory="static"), name="static")
 
 @app.get("/")
 async def index():
-    html = open("index.html", "r", encoding="utf-8").read()
+    html = open("static/index.html", "r", encoding="utf-8").read()
     return HTMLResponse(content=html)
 
 
-
-if __name__ == "__main__":
-    uvicorn.run(app, host="127.0.0.1", port=8000)
