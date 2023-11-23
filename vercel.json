@@ -1,7 +1,0 @@
-{
-    "rewrites": [
-		{ "source": "/", "destination": "app.py" },
-		{ "source": "/estadisticas", "destination": "app.py" },
-		{ "source": "/openapi.json", "destination": "app.py" }
-    ]
-}
