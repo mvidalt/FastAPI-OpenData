@@ -1,7 +1,7 @@
 {
     "rewrites": [
-		{ "src": "/", "dest": "main.py" },
-		{ "src": "/estadisticas", "dest": "main.py" },
-		{ "src": "conteo/{isla}", "dest": "main.py" }
+		{ "source": "/", "destination": "app.py" },
+		{ "source": "/estadisticas", "destination": "app.py" },
+		{ "source": "/openapi.json", "destination": "app.py" }
     ]
 }
