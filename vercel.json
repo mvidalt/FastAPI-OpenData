@@ -1,6 +1,5 @@
 {
     "rewrites": [
-
+        {"source": "/estadisticas", "destination": "/estadisticas"}
     ]
-  }
-  
+}
