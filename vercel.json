@@ -1,5 +1,9 @@
 {
     "rewrites": [
-        {"source": "/(.*)", "destination": "/"}
+      { "source": "/playas", "destination": "/playas" },
+      { "source": "/estadisticas", "destination": "/estadisticas" },
+      { "source": "/otra-ruta", "destination": "/otra-ruta" },
+      { "source": "/(.*)", "destination": "/" }
     ]
-}
+  }
+  
